@@ -1,0 +1,14 @@
+numpy
+pandas
+scikit-learn
+scipy
+joblib
+tqdm
+pillow
+requests
+fastapi
+uvicorn
+lightgbm
+transformers
+torch
+torchvision

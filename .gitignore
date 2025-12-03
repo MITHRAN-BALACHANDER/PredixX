@@ -137,3 +137,4 @@ image_cache/
 # Temporary files
 *.tmp
 *.temp
+.mpnet_train_v5.pkl

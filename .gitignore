@@ -123,9 +123,8 @@ Thumbs.db
 data/
 
 # Model artifacts (e.g., pickled models)
-artifacts/
-*.pkl
-*.npy
+
+
 
 # Embeddings (large numpy arrays)
 embeddings/
@@ -139,3 +138,9 @@ image_cache/
 # Temporary files
 *.tmp
 *.temp
+
+/docs
+/frontend/
+/setup/
+/backend/
+/.github/

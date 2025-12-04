@@ -140,7 +140,7 @@ image_cache/
 *.temp
 
 /docs
-/frontend/
+#/frontend/
 /setup/
 /backend/
 /.github/

@@ -141,6 +141,6 @@ image_cache/
 
 /docs
 #/frontend/
-/setup/
+#/setup/
 /backend/
 /.github/

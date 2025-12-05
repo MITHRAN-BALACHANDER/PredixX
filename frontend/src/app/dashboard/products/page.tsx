@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<any[]>([]);
   const [stores, setStores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -12,17 +14,45 @@ export default function ProductsPage() {
     store_id: 0,
     sku: '',
     title: '',
+    description: '',
+    image_url: '',
     cost_price: 0,
     current_price: 0,
     min_price: 0,
     max_price: 0,
     inventory: 0,
-    stock_age_days: 0
+    stock_age_days: 0,
+    predicted_price: 0
   });
 
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    // Check for pre-filled data from Evaluate page
+    const title = searchParams.get('title');
+    const description = searchParams.get('description');
+    const predictedPrice = searchParams.get('predicted_price');
+    const quantity = searchParams.get('quantity');
+
+    if (title) {
+      setShowForm(true);
+      setFormData(prev => ({
+        ...prev,
+        title: title || '',
+        description: description || '',
+        current_price: predictedPrice ? parseFloat(predictedPrice) : 0,
+        predicted_price: predictedPrice ? parseFloat(predictedPrice) : 0,
+        inventory: quantity ? parseInt(quantity) : 0,
+        // Set reasonable defaults for required fields
+        sku: `SKU-${Math.floor(Math.random() * 10000)}`,
+        cost_price: predictedPrice ? parseFloat(predictedPrice) * 0.6 : 0,
+        min_price: predictedPrice ? parseFloat(predictedPrice) * 0.8 : 0,
+        max_price: predictedPrice ? parseFloat(predictedPrice) * 1.2 : 0,
+      }));
+    }
+  }, [searchParams]);
 
   const loadData = async () => {
     try {
@@ -56,12 +86,15 @@ export default function ProductsPage() {
         store_id: stores.length > 0 ? stores[0].id : 0,
         sku: '',
         title: '',
+        description: '',
+        image_url: '',
         cost_price: 0,
         current_price: 0,
         min_price: 0,
         max_price: 0,
         inventory: 0,
-        stock_age_days: 0
+        stock_age_days: 0,
+        predicted_price: 0
       });
       loadData();
     } catch (error) {
@@ -130,6 +163,25 @@ export default function ProductsPage() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2"
                 value={formData.title}
                 onChange={e => setFormData({...formData, title: e.target.value})}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Description</label>
+              <textarea
+                rows={3}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2"
+                value={formData.description}
+                onChange={e => setFormData({...formData, description: e.target.value})}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Image URL</label>
+              <input
+                type="text"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2"
+                value={formData.image_url}
+                onChange={e => setFormData({...formData, image_url: e.target.value})}
+                placeholder="https://example.com/image.jpg"
               />
             </div>
             <div>
@@ -225,6 +277,9 @@ export default function ProductsPage() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{product.title}</div>
                   <div className="text-sm text-gray-500">{product.sku}</div>
+                  {product.description && (
+                    <div className="text-xs text-gray-400 truncate max-w-xs">{product.description}</div>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">${product.current_price}</div>

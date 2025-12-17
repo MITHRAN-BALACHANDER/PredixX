@@ -4,12 +4,21 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
+import { 
+  Mail, 
+  Lock, 
+  UserPlus, 
+  Loader2, 
+  AlertCircle,
+  Sparkles,
+  ArrowLeft,
+  CheckCircle
+} from 'lucide-react';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('merchant');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -24,113 +33,128 @@ export default function RegisterPage() {
       return;
     }
 
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await register(email, password, role);
-      router.push('/dashboard');
+      await register(email, password);
+      router.push('/');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      setError(err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
-        <div>
-          <h2 className="text-center text-3xl font-bold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Join Dynamic Pricing Engine
-          </p>
+    <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 mb-4">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-white">Create account</h1>
+          <p className="text-gray-500 mt-1">Get started with PredixX</p>
         </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          
-          <div className="space-y-4">
+
+        {/* Form Card */}
+        <div className="card">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+
+            {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+              <label className="label flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                Email
               </label>
               <input
-                id="email"
                 type="email"
-                required
-                className="input mt-1"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className="input"
               />
             </div>
-            
+
+            {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label className="label flex items-center gap-2">
+                <Lock className="w-4 h-4" />
                 Password
               </label>
               <input
-                id="password"
                 type="password"
-                required
-                className="input mt-1"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="input"
               />
             </div>
-            
+
+            {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label className="label flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
                 Confirm Password
               </label>
               <input
-                id="confirmPassword"
                 type="password"
-                required
-                className="input mt-1"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="input"
               />
             </div>
-            
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Role
-              </label>
-              <select
-                id="role"
-                className="input mt-1"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="merchant">Merchant</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-          </div>
 
-          <div>
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="btn btn-primary w-full"
+              className="btn btn-primary w-full flex items-center justify-center gap-2"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-5 h-5" />
+                  Create Account
+                </>
+              )}
             </button>
+          </form>
+
+          {/* Login Link */}
+          <div className="mt-6 pt-6 border-t border-[#2a2a2a] text-center">
+            <p className="text-gray-500 text-sm">
+              Already have an account?{' '}
+              <Link 
+                href="/login" 
+                className="text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Sign in
+              </Link>
+            </p>
           </div>
-          
-          <div className="text-center text-sm">
-            <span className="text-gray-600">Already have an account? </span>
-            <Link href="/login" className="text-primary-600 hover:text-primary-500">
-              Sign in
-            </Link>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
